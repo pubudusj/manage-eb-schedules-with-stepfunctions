@@ -1,0 +1,50 @@
+{
+  "Comment": "ManageSchedulesStateMachine",
+  "StartAt": "CreateSchedule",
+  "States": {
+    "CreateSchedule": {
+      "Type": "Task",
+      "Parameters": {
+        "FlexibleTimeWindow": {
+          "Mode": "OFF"
+        },
+        "Name.$": "States.Format('schedule_{}', $$.Execution.Name)",
+        "GroupName": "${ScheduleGroup}",
+        "ScheduleExpression.$": "States.Format('at({}T{})', $.scheduleDate, $.scheduleTime)",
+        "Target": {
+          "Arn": "${TargetArn}",
+          "RoleArn": "${RoleArn}",
+          "Input": {"token.$": "$$.Task.Token", "error.$": "$.error" }
+        }
+      },
+      "Resource": "arn:aws:states:::aws-sdk:scheduler:createSchedule.waitForTaskToken",
+      "Next": "SendResultToSNS",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "SendResultToSNS"
+        }
+      ]
+    },
+    "SendResultToSNS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "Message.$": "$",
+        "TopicArn": "${SnsTopicArn}"
+      },
+      "Next": "DeleteSchedule"
+    },
+    "DeleteSchedule": {
+      "Type": "Task",
+      "End": true,
+      "Parameters": {
+        "Name.$": "States.Format('schedule_{}', $$.Execution.Name)",
+        "GroupName": "${ScheduleGroup}"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:scheduler:deleteSchedule"
+    }
+  }
+}
