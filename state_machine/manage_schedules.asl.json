@@ -14,7 +14,10 @@
         "Target": {
           "Arn": "${TargetArn}",
           "RoleArn": "${RoleArn}",
-          "Input": {"token.$": "$$.Task.Token", "error.$": "$.error" }
+          "Input": {
+            "token.$": "$$.Task.Token",
+            "error.$": "$.error"
+          }
         }
       },
       "Resource": "arn:aws:states:::aws-sdk:scheduler:createSchedule.waitForTaskToken",
