@@ -4,7 +4,7 @@ This project contains source code for a serverless application to create, and de
 
 ## Blog Post
 
-You may read more about this at [URL]
+You may read more about this here: https://medium.com/@pubudusj/manage-eventbridge-schedules-using-step-functions-16c47d1f8428 
 
 ## Deploy the application
 
